@@ -319,7 +319,7 @@ function! s:set_issues_body(resp) abort
     call gh#gh#set_message_buf('no description provided')
     return
   endif
-  let s:issue['title'] = a:resp.body.title
+  let sbissue['title'] = a:resp.body.title
   call setbufline(s:gh_issues_edit_bufid, 1, split(a:resp.body.body, '\r\?\n'))
   setlocal nomodified buftype=acwrite ft=markdown
 
@@ -338,9 +338,9 @@ function! gh#issues#issue() abort
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)$')
 
   call gh#gh#delete_buffer(s:, 'gh_issues_edit_bufid')
-  let s:gh_issues_edit_bufid = bufnr()
+  let b:gh_issues_edit_bufid = bufnr()
 
-  let s:issue = {
+  let b:issue = {
         \ 'repo': {
         \   'owner': m[1],
         \   'name': m[2],
@@ -352,9 +352,9 @@ function! gh#issues#issue() abort
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
-  call gh#github#issues#issue(s:issue.repo.owner, s:issue.repo.name, s:issue.number)
+  call gh#github#issues#issue(b:issue.repo.owner, b:issue.repo.name, b:issue.number)
         \.then(function('s:set_issues_body'))
-        \.then({-> gh#map#apply('gh-buffer-issue-edit', s:gh_issues_edit_bufid)})
+        \.then({-> gh#map#apply('gh-buffer-issue-edit', b:gh_issues_edit_bufid)})
         \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})
 endfunction
 
